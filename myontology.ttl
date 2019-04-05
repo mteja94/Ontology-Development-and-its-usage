@@ -1,0 +1,328 @@
+@prefix : <http://change.this.to.your.github.raw.ontology.file.ttl#> .
+@prefix owl: <http://www.w3.org/2002/07/owl#> .
+@prefix rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> .
+@prefix xml: <http://www.w3.org/XML/1998/namespace> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix rdfs: <http://www.w3.org/2000/01/rdf-schema#> .
+@base <http://change.this.to.your.github.raw.ontology.file.ttl> .
+
+<http://change.this.to.your.github.raw.ontology.file.ttl> rdf:type owl:Ontology ;
+                                                           rdfs:comment "HW4 ontology file" .
+
+#################################################################
+#    Object Properties
+#################################################################
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#employer
+:employer rdf:type owl:ObjectProperty ,
+                   owl:AsymmetricProperty ,
+                   owl:IrreflexiveProperty ;
+          rdfs:domain [ owl:intersectionOf ( :Person
+                                             [ rdf:type owl:Class ;
+                                               owl:complementOf :Infant
+                                             ]
+                                           ) ;
+                        rdf:type owl:Class
+                      ] ;
+          rdfs:range :Organization .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#father
+:father rdf:type owl:ObjectProperty ;
+        rdfs:subPropertyOf :parent ;
+        rdf:type owl:FunctionalProperty ,
+                 owl:AsymmetricProperty ,
+                 owl:IrreflexiveProperty ;
+        rdfs:domain :Person ;
+        rdfs:range :Man ,
+                   [ rdf:type owl:Restriction ;
+                     owl:onProperty :father ;
+                     owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                     owl:onClass :Man
+                   ] ;
+        owl:propertyDisjointWith :mother .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#grandfather
+:grandfather rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf :grandparent ;
+             owl:propertyChainAxiom ( :parent
+                                      :father
+                                    ) .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#grandmother
+:grandmother rdf:type owl:ObjectProperty ;
+             rdfs:subPropertyOf :grandparent ;
+             owl:propertyChainAxiom ( :parent
+                                      :mother
+                                    ) .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#grandparent
+:grandparent rdf:type owl:ObjectProperty ;
+             owl:propertyChainAxiom ( :parent
+                                      :parent
+                                    ) .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#location
+:location rdf:type owl:ObjectProperty ,
+                   owl:AsymmetricProperty ,
+                   owl:IrreflexiveProperty ;
+          rdfs:domain :Physical ;
+          rdfs:range :Place .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#mother
+:mother rdf:type owl:ObjectProperty ;
+        rdfs:subPropertyOf :parent ;
+        rdf:type owl:FunctionalProperty ,
+                 owl:AsymmetricProperty ,
+                 owl:IrreflexiveProperty ;
+        rdfs:domain :Person ;
+        rdfs:range :Woman ,
+                   [ rdf:type owl:Restriction ;
+                     owl:onProperty :mother ;
+                     owl:qualifiedCardinality "1"^^xsd:nonNegativeInteger ;
+                     owl:onClass :Woman
+                   ] .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#parent
+:parent rdf:type owl:ObjectProperty ,
+                 owl:AsymmetricProperty ,
+                 owl:IrreflexiveProperty ;
+        rdfs:domain :Person ;
+        rdfs:range [ rdf:type owl:Restriction ;
+                     owl:onProperty :parent ;
+                     owl:qualifiedCardinality "2"^^xsd:nonNegativeInteger ;
+                     owl:onClass :Adult
+                   ] .
+
+
+#################################################################
+#    Data properties
+#################################################################
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Latitude
+:Latitude rdf:type owl:DatatypeProperty ,
+                   owl:FunctionalProperty ;
+          rdfs:domain :Place ;
+          rdfs:range owl:real .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Longitude
+:Longitude rdf:type owl:DatatypeProperty ,
+                    owl:FunctionalProperty ;
+           rdfs:domain :Place ;
+           rdfs:range owl:real .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#age
+:age rdf:type owl:DatatypeProperty ,
+              owl:FunctionalProperty ;
+     rdfs:domain :Person ;
+     rdfs:range xsd:nonNegativeInteger .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#sex
+:sex rdf:type owl:DatatypeProperty ,
+              owl:FunctionalProperty ;
+     rdfs:domain :SexualReproducers ;
+     rdfs:range [ rdf:type rdfs:Datatype ;
+                  owl:oneOf [ rdf:type rdf:List ;
+                              rdf:first "female" ;
+                              rdf:rest [ rdf:type rdf:List ;
+                                         rdf:first "male" ;
+                                         rdf:rest rdf:nil
+                                       ]
+                            ]
+                ] .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#ssn
+:ssn rdf:type owl:DatatypeProperty ,
+              owl:FunctionalProperty ;
+     rdfs:domain :Person ;
+     rdfs:range xsd:string .
+
+
+#################################################################
+#    Classes
+#################################################################
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Abstract
+:Abstract rdf:type owl:Class ;
+          owl:disjointWith :Physical .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Adult
+:Adult rdf:type owl:Class ;
+       owl:equivalentClass [ owl:intersectionOf ( :Person
+                                                  [ rdf:type owl:Restriction ;
+                                                    owl:onProperty :age ;
+                                                    owl:someValuesFrom [ rdf:type rdfs:Datatype ;
+                                                                         owl:onDatatype xsd:nonNegativeInteger ;
+                                                                         owl:withRestrictions ( [ xsd:minExclusive "18"^^xsd:int
+                                                                                                ]
+                                                                                              )
+                                                                       ]
+                                                  ]
+                                                ) ;
+                             rdf:type owl:Class
+                           ] ;
+       rdfs:subClassOf :Person ;
+       owl:disjointWith :Child ,
+                        :Infant .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Animate
+:Animate rdf:type owl:Class ;
+         rdfs:subClassOf :Physical ;
+         owl:disjointWith :Inanimate .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Boy
+:Boy rdf:type owl:Class ;
+     owl:equivalentClass [ owl:intersectionOf ( :Male
+                                                :Person
+                                                [ rdf:type owl:Class ;
+                                                  owl:complementOf :Adult
+                                                ]
+                                              ) ;
+                           rdf:type owl:Class
+                         ] ;
+     rdfs:subClassOf :Person ;
+     owl:disjointWith :Girl .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Child
+:Child rdf:type owl:Class ;
+       owl:equivalentClass [ owl:intersectionOf ( :Person
+                                                  [ rdf:type owl:Restriction ;
+                                                    owl:onProperty :age ;
+                                                    owl:someValuesFrom [ rdf:type rdfs:Datatype ;
+                                                                         owl:onDatatype xsd:nonNegativeInteger ;
+                                                                         owl:withRestrictions ( [ xsd:minInclusive "2"^^xsd:int
+                                                                                                ]
+                                                                                              )
+                                                                       ]
+                                                  ]
+                                                  [ rdf:type owl:Restriction ;
+                                                    owl:onProperty :age ;
+                                                    owl:someValuesFrom [ rdf:type rdfs:Datatype ;
+                                                                         owl:onDatatype xsd:nonNegativeInteger ;
+                                                                         owl:withRestrictions ( [ xsd:maxInclusive "18"^^xsd:int
+                                                                                                ]
+                                                                                              )
+                                                                       ]
+                                                  ]
+                                                ) ;
+                             rdf:type owl:Class
+                           ] ;
+       rdfs:subClassOf :Person ;
+       owl:disjointWith :Infant .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Female
+:Female rdf:type owl:Class ;
+        rdfs:subClassOf :SexualReproducers ;
+        owl:disjointWith :Male .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Girl
+:Girl rdf:type owl:Class ;
+      owl:equivalentClass [ owl:intersectionOf ( :Female
+                                                 :Person
+                                                 [ rdf:type owl:Class ;
+                                                   owl:complementOf :Adult
+                                                 ]
+                                               ) ;
+                            rdf:type owl:Class
+                          ] ;
+      rdfs:subClassOf :Person .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Inanimate
+:Inanimate rdf:type owl:Class ;
+           rdfs:subClassOf :Physical .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Infant
+:Infant rdf:type owl:Class ;
+        owl:equivalentClass [ owl:intersectionOf ( :Person
+                                                   [ rdf:type owl:Restriction ;
+                                                     owl:onProperty :age ;
+                                                     owl:someValuesFrom [ rdf:type rdfs:Datatype ;
+                                                                          owl:onDatatype xsd:nonNegativeInteger ;
+                                                                          owl:withRestrictions ( [ xsd:maxInclusive "1"^^xsd:int
+                                                                                                 ]
+                                                                                               )
+                                                                        ]
+                                                   ]
+                                                 ) ;
+                              rdf:type owl:Class
+                            ] ;
+        rdfs:subClassOf :Person .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Male
+:Male rdf:type owl:Class ;
+      rdfs:subClassOf :SexualReproducers .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Man
+:Man rdf:type owl:Class ;
+     owl:equivalentClass [ owl:intersectionOf ( :SexualReproducers
+                                                [ rdf:type owl:Restriction ;
+                                                  owl:onProperty :sex ;
+                                                  owl:hasValue "male"
+                                                ]
+                                              ) ;
+                           rdf:type owl:Class
+                         ] ;
+     rdfs:subClassOf :Male ,
+                     :Person .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Organization
+:Organization rdf:type owl:Class ;
+              rdfs:subClassOf :Abstract .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Person
+:Person rdf:type owl:Class ;
+        rdfs:subClassOf :SexualReproducers .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Physical
+:Physical rdf:type owl:Class .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Place
+:Place rdf:type owl:Class ;
+       rdfs:subClassOf :Abstract .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#SexualReproducers
+:SexualReproducers rdf:type owl:Class ;
+                   rdfs:subClassOf :Animate .
+
+
+###  http://change.this.to.your.github.raw.ontology.file.ttl#Woman
+:Woman rdf:type owl:Class ;
+       owl:equivalentClass [ owl:intersectionOf ( :SexualReproducers
+                                                  [ rdf:type owl:Restriction ;
+                                                    owl:onProperty :sex ;
+                                                    owl:hasValue "female"
+                                                  ]
+                                                ) ;
+                             rdf:type owl:Class
+                           ] ;
+       rdfs:subClassOf :Female ,
+                       :Person .
+
+
+###  Generated by the OWL API (version 4.5.6.2018-09-06T00:27:41Z) https://github.com/owlcs/owlapi
+
